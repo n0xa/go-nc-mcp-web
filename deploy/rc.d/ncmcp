@@ -1,0 +1,10 @@
+#!/bin/ksh
+
+daemon="/usr/local/bin/go-nc-mcp-web"
+daemon_user="_ncmcp"
+
+. /etc/rc.d/rc.subr
+
+rc_bg=YES
+
+rc_cmd $1
