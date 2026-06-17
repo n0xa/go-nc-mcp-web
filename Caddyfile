@@ -1,0 +1,3 @@
+mcp.example.com {
+	reverse_proxy ncmcp:8080
+}

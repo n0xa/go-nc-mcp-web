@@ -79,6 +79,21 @@ relay wwwtls {
 
 An OpenBSD rc.d script is provided in `deploy/rc.d/ncmcp`.
 
+### Docker Compose
+
+A `docker-compose.yml` is included with Caddy for automatic TLS:
+
+1. Edit `docker-compose.yml` and set your `NEXTCLOUD_HOST` and `MCP_HOSTNAME`
+2. Edit `Caddyfile` and replace `mcp.example.com` with your domain
+3. Run `docker compose up -d`
+
+Caddy will automatically obtain and renew a LetsEncrypt certificate for
+your domain. Make sure DNS points to your server and port 443 is open.
+
+You can substitute nginx, Traefik, or any other reverse proxy for Caddy.
+The only requirement is that TLS is terminated before traffic reaches the
+MCP container on port 8080.
+
 ## Connecting to Claude
 
 1. In Claude settings, create a Custom Connector

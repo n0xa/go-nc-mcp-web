@@ -1,0 +1,20 @@
+services:
+  ncmcp:
+    build: .
+    environment:
+      - NEXTCLOUD_HOST=https://nc.example.com
+      - MCP_LISTEN=:8080
+      - MCP_HOSTNAME=mcp.example.com
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
