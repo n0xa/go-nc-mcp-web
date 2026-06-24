@@ -314,6 +314,58 @@ func registerDeckTools(srv *mcp.Server) {
 	})
 
 	srv.RegisterTool(mcp.Tool{
+		Name:        "deck_archive_card",
+		Description: "Archive a Deck card",
+		InputSchema: mcp.InputSchema{
+			Type: "object",
+			Properties: map[string]mcp.PropertySchema{
+				"boardId": prop("boardId", "integer", "Board ID"),
+				"stackId": prop("stackId", "integer", "Stack ID"),
+				"cardId":  prop("cardId", "integer", "Card ID"),
+			},
+			Required: []string{"boardId", "stackId", "cardId"},
+		},
+	}, func(ctx context.Context, args map[string]interface{}) *mcp.ToolResult {
+		boardID, _ := requireInt(args, "boardId")
+		stackID, _ := requireInt(args, "stackId")
+		cardID, err := requireInt(args, "cardId")
+		if err != nil {
+			return mcp.ErrorResult(err.Error())
+		}
+		card, err := client(ctx).DeckArchiveCard(boardID, stackID, cardID)
+		if err != nil {
+			return mcp.ErrorResult(err.Error())
+		}
+		return jsonResult(card)
+	})
+
+	srv.RegisterTool(mcp.Tool{
+		Name:        "deck_unarchive_card",
+		Description: "Unarchive a Deck card",
+		InputSchema: mcp.InputSchema{
+			Type: "object",
+			Properties: map[string]mcp.PropertySchema{
+				"boardId": prop("boardId", "integer", "Board ID"),
+				"stackId": prop("stackId", "integer", "Stack ID"),
+				"cardId":  prop("cardId", "integer", "Card ID"),
+			},
+			Required: []string{"boardId", "stackId", "cardId"},
+		},
+	}, func(ctx context.Context, args map[string]interface{}) *mcp.ToolResult {
+		boardID, _ := requireInt(args, "boardId")
+		stackID, _ := requireInt(args, "stackId")
+		cardID, err := requireInt(args, "cardId")
+		if err != nil {
+			return mcp.ErrorResult(err.Error())
+		}
+		card, err := client(ctx).DeckUnarchiveCard(boardID, stackID, cardID)
+		if err != nil {
+			return mcp.ErrorResult(err.Error())
+		}
+		return jsonResult(card)
+	})
+
+	srv.RegisterTool(mcp.Tool{
 		Name:        "deck_remove_label_from_card",
 		Description: "Remove a label from a Deck card",
 		InputSchema: mcp.InputSchema{

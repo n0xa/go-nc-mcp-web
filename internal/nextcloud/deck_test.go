@@ -136,6 +136,26 @@ func TestDeckFullLifecycle(t *testing.T) {
 		t.Log("no labels on board, skipping label tests")
 	}
 
+	// Archive card
+	archived, err := nc.DeckArchiveCard(boardID, stack2.ID, cardID)
+	if err != nil {
+		t.Fatalf("DeckArchiveCard: %v", err)
+	}
+	t.Logf("archived card %d", cardID)
+	if archived != nil && archived.ID != cardID {
+		t.Errorf("archived card ID = %d, want %d", archived.ID, cardID)
+	}
+
+	// Unarchive card
+	unarchived, err := nc.DeckUnarchiveCard(boardID, stack2.ID, cardID)
+	if err != nil {
+		t.Fatalf("DeckUnarchiveCard: %v", err)
+	}
+	t.Logf("unarchived card %d", cardID)
+	if unarchived != nil && unarchived.ID != cardID {
+		t.Errorf("unarchived card ID = %d, want %d", unarchived.ID, cardID)
+	}
+
 	// Delete card
 	err = nc.DeckDeleteCard(boardID, stack2.ID, cardID)
 	if err != nil {
@@ -357,4 +377,50 @@ func TestDeckUpdateWithDoneField(t *testing.T) {
 	if updated2.Description != "Must survive done update" {
 		t.Errorf("REGRESSION: description lost after done=nil update! got %q", updated2.Description)
 	}
+}
+
+func TestDeckArchiveUnarchive(t *testing.T) {
+	nc := loadTestEnv(t)
+
+	boards, err := nc.DeckGetBoards()
+	if err != nil {
+		t.Fatalf("DeckGetBoards: %v", err)
+	}
+	if len(boards) == 0 {
+		t.Skip("no boards available")
+	}
+	boardID := boards[0].ID
+
+	stacks, err := nc.DeckGetStacks(boardID)
+	if err != nil {
+		t.Fatalf("DeckGetStacks: %v", err)
+	}
+	if len(stacks) == 0 {
+		t.Skip("no stacks available")
+	}
+	stackID := stacks[0].ID
+
+	card, err := nc.DeckCreateCard(boardID, stackID, "Archive Test Card", "Testing archive/unarchive", "")
+	if err != nil {
+		t.Fatalf("DeckCreateCard: %v", err)
+	}
+	defer nc.DeckDeleteCard(boardID, stackID, card.ID)
+
+	archived, err := nc.DeckArchiveCard(boardID, stackID, card.ID)
+	if err != nil {
+		t.Fatalf("DeckArchiveCard: %v", err)
+	}
+	if archived != nil && archived.ID != card.ID {
+		t.Errorf("archived card ID = %d, want %d", archived.ID, card.ID)
+	}
+	t.Logf("archived card %d", card.ID)
+
+	unarchived, err := nc.DeckUnarchiveCard(boardID, stackID, card.ID)
+	if err != nil {
+		t.Fatalf("DeckUnarchiveCard: %v", err)
+	}
+	if unarchived != nil && unarchived.ID != card.ID {
+		t.Errorf("unarchived card ID = %d, want %d", unarchived.ID, card.ID)
+	}
+	t.Logf("unarchived card %d", card.ID)
 }

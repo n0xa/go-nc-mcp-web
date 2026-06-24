@@ -187,3 +187,15 @@ func (c *Client) DeckRemoveLabel(boardID, stackID, cardID, labelID int) error {
 	data, _ := json.Marshal(body)
 	return c.DoJSON("PUT", fmt.Sprintf("%s/boards/%d/stacks/%d/cards/%d/removeLabel", deckBase, boardID, stackID, cardID), bytes.NewReader(data), nil)
 }
+
+func (c *Client) DeckArchiveCard(boardID, stackID, cardID int) (*Card, error) {
+	var card Card
+	err := c.DoJSON("PUT", fmt.Sprintf("%s/boards/%d/stacks/%d/cards/%d/archive", deckBase, boardID, stackID, cardID), nil, &card)
+	return &card, err
+}
+
+func (c *Client) DeckUnarchiveCard(boardID, stackID, cardID int) (*Card, error) {
+	var card Card
+	err := c.DoJSON("PUT", fmt.Sprintf("%s/boards/%d/stacks/%d/cards/%d/unarchive", deckBase, boardID, stackID, cardID), nil, &card)
+	return &card, err
+}
