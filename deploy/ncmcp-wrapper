@@ -1,0 +1,4 @@
+#!/bin/ksh
+. /etc/ncmcp.env
+export NEXTCLOUD_HOST MCP_LISTEN
+exec /usr/local/bin/go-nc-mcp-web
