@@ -13,6 +13,21 @@ import (
 	"go-nc-mcp-web/internal/tools"
 )
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 
@@ -46,7 +61,7 @@ func main() {
 	mux.HandleFunc("/.well-known/oauth-authorization-server", oauth.Metadata)
 	mux.HandleFunc("/authorize", oauth.Authorize)
 	mux.HandleFunc("/token", oauth.Token)
-	mux.Handle("/mcp", mcpHandler)
+	mux.Handle("/mcp", corsMiddleware(mcpHandler))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("unhandled: %s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
 		http.NotFound(w, r)
